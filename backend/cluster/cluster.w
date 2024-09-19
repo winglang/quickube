@@ -96,29 +96,6 @@ pub class Q8sCluster {
       },
     );
 
-    // let targetGroup = new aws.lbTargetGroup.LbTargetGroup(
-    //   port: 7443,
-    //   protocol: "HTTPS",
-    //   vpcId: vpcId,
-
-    //   healthCheck: {
-    //     enabled: true,
-    //     path: "/",
-    //     healthyThreshold: 3,
-    //     unhealthyThreshold: 3,
-    //     timeout: 5,
-    //     interval: 30,
-    //     protocol: "HTTPS",
-    //     matcher: "403", // since we are not authenticated, we should get a 403
-    //   },
-    // );
-
-    // new aws.lbTargetGroupAttachment.LbTargetGroupAttachment(
-    //   targetGroupArn: targetGroup.arn,
-    //   targetId: instance.id,
-    //   port: 7443,
-    // );
-
     let connection = {
       type: "ssh",
       host: instance.publicDns,

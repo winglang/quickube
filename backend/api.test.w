@@ -174,7 +174,8 @@ test "create new cluster with custom options" {
       "clusters": [
         {
           "cluster": {
-            "server": "https://q8s-0.dummy.com:7443"
+            "server": "https://q8s-0.dummy.com:7443",
+            "insecure-skip-tls-verify": true
           },
           "name": "q8s-0"
         }

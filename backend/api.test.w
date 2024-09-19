@@ -101,6 +101,7 @@ test "create new cluster with defaults" {
       "clusters": [
         {
           "cluster": {
+            "insecure-skip-tls-verify": true,
             "server": "https://q8s-0.dummy.com:7443"
           },
           "name": "q8s-0"
@@ -307,6 +308,7 @@ test "get cluster" {
       "clusters": [
         {
           "cluster": {
+            "insecure-skip-tls-verify": true,
             "server": "https://q8s-0.dummy.com:7443"
           },
           "name": "q8s-0"

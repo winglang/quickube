@@ -18,7 +18,10 @@ BLOB := $(TARGET_DIR)/q8s.blob
 OUTPUT_BINARY := $(DIST_DIR)/q8s
 
 # Default target
-all: build
+all: build_cli test_backend
+
+test_backend:
+	cd backend && wing test
 
 # Create the dist directory
 $(DIST_DIR):
@@ -28,7 +31,7 @@ $(TARGET_DIR):
 	mkdir -p $(TARGET_DIR)
 
 # Build the single-file executable
-build: $(DIST_DIR) $(TARGET_DIR)
+build_cli: $(DIST_DIR) $(TARGET_DIR)
 	$(NCC_BIN) build $(Q8S_SRC) -o $(TARGET_DIR)
 	echo '{ "main": "$(JS_OUTPUT)", "output": "$(BLOB)", "disableExperimentalSEAWarning": true, "useSnapshot": false, "useCodeCache": true }' > $(SEA_CONFIG)
 	node --experimental-sea-config $(SEA_CONFIG)
@@ -44,4 +47,4 @@ clean:
 	rm -rf $(DIST_DIR)
 
 # Phony targets
-.PHONY: all build clean
+.PHONY: all build_cli clean test_backend

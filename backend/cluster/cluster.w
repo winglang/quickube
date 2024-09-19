@@ -2,10 +2,10 @@ bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as aws;
 bring "@cdktf/provider-null" as tfnull;
 bring "@cdktf/provider-local" as local;
+bring "../types.w" as t;
 bring fs;
 bring tf;
 bring util;
-bring "./backend/types.w" as t;
 
 pub struct Q8sClusterSpec {
   size: t.Size;
@@ -55,7 +55,7 @@ pub class Q8sCluster {
       }],
     );
 
-    let userData = fs.readFile("{@dirname}/setup/userdata.sh");
+    let userData = fs.readFile("{@dirname}/userdata.sh");
     let userDataBase64 = util.base64Encode(userData);
     let user = "ec2-user";
 

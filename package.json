@@ -1,7 +1,6 @@
 {
   "name": "quick8s",
-  "version": "1.0.0",
-  "keywords": [],
+  "version": "0.0.1",
   "dependencies": {
     "@aws-sdk/client-elastic-load-balancing-v2": "^3.654.0",
     "@aws-sdk/client-route-53": "^3.651.1",
@@ -13,8 +12,12 @@
     "cdktf": "^0.20.8",
     "yaml": "^2.5.1"
   },
+  "scripts": {
+    "build": "make"
+  },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",
-    "postject": "^1.0.0-alpha.6"
+    "postject": "^1.0.0-alpha.6",
+    "winglang": "^0.85.10"
   }
 }

@@ -1,6 +1,5 @@
 bring util;
-bring "./cluster.w" as c;
-bring "./backend/types.w" as t;
+bring "../backend/cluster" as c;
 
 let addCapacity = (size: t.Size, count: num) => {
   for i in 0..count {

@@ -12,6 +12,7 @@ test "renderKubeConfig" {
     "clusters": [
       {
         "cluster": {
+          "insecure-skip-tls-verify": true,
           "server": "https://boom.host.com:7443"
         },
         "name": "my-cluster-name"

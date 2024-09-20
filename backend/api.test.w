@@ -64,8 +64,10 @@ pp.populate(pool);
 
 let dns = new d.DnsSimulation();
 
+let garbage = new g.Garbage();
+
 let api = new a.Api(
-  garbage: new g.Garbage(),
+  garbage: garbage,
   names: new MockNames(),
   clusters: new c.Clusters(),
   dns: dns,

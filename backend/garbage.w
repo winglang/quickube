@@ -9,7 +9,7 @@ pub class Garbage impl std.IHostedLiftable {
     this.q = q;
 
     q.setConsumer(inflight (instanceId) => {
-      log("terminating instance {instanceId}");
+      log("hello, I am terminating instance {instanceId}");
       Garbage.terminateInstance(instanceId);
     });
   }

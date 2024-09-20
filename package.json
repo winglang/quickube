@@ -12,13 +12,9 @@
     "cdktf": "^0.20.8",
     "yaml": "^2.5.1"
   },
-  "scripts": {
-    "build": "make"
-  },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1",
     "postject": "^1.0.0-alpha.6",
-    "tar": "^7.4.3",
     "winglang": "^0.85.10"
   }
 }

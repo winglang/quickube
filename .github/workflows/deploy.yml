@@ -26,6 +26,10 @@ jobs:
 
   deploy-backend:
     runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     # needs:
     #   - test-backend
     steps:
@@ -46,8 +50,4 @@ jobs:
         working-directory: backend/target/main.tfaws
       - run: terraform apply -auto-approve
         working-directory: backend/target/main.tfaws
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     

@@ -151,6 +151,7 @@ pub class Capacity {
       desiredCapacity: props.count ?? 1,
       minSize: props.count ?? 1,
       maxSize: props.count ?? 1,
+      protectFromScaleIn: true,
       launchTemplate: {
         name: launchTemplate.name,
         version: cdktf.Fn.tostring(launchTemplate.latestVersion)

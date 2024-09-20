@@ -8,6 +8,7 @@ bring "./pool.w" as p;
 bring "./dns" as d;
 bring "./kubeconfig.w" as kc;
 bring "./custom-domain.w" as cd;
+bring "./garbage.w" as g;
 
 pub struct ApiProps {
   clusters: c.Clusters;
@@ -16,6 +17,7 @@ pub struct ApiProps {
   user: str;
   dns: d.IDns;
   customDomain: cd.CustomDomainConfig?;
+  garbage: g.Garbage;
 }
 
 pub class Api {
@@ -129,6 +131,7 @@ pub class Api {
         if let existing = clusters.tryGet(user, name) {
           this.dns.removeARecord(existing.name, existing.host.publicIp);
           let deleted = clusters.delete(user, name);
+          props.garbage.toss(existing.host.instanceId);
           return statusOk({ name, deleted });
         } else {
           return statusOk({ name, deleted: false });

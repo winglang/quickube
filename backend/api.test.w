@@ -10,6 +10,7 @@ bring "./pool.w" as p;
 bring "./bucket.w" as b;
 bring "./dns" as d;
 bring "./pool-populate.w" as pp;
+bring "./garbage.w" as g;
 
 let kubeConfigFor = inflight (name: str) => {
   return {
@@ -64,6 +65,7 @@ pp.populate(pool);
 let dns = new d.DnsSimulation();
 
 let api = new a.Api(
+  garbage: new g.Garbage(),
   names: new MockNames(),
   clusters: new c.Clusters(),
   dns: dns,

@@ -7,6 +7,7 @@ bring "./pool.w" as p;
 bring "./bucket.w" as b;
 bring "./dns" as d;
 bring "./capacity.w" as cp;
+bring "./garbage.w" as g;
 bring util;
 
 let pool = new p.Pool();
@@ -41,10 +42,13 @@ new cp.Capacity(
   pool: pool.bucket,
 ) as "LargeCapacity";
 
+let garbage = new g.Garbage();
+
 new a.Api(
   user: util.env("API_USER"),
   clusters: new c.Clusters(),
   names: new names.NameGenerator(),
+  garbage: garbage,
   pool: pool,
   dns: dns,
   customDomain: {

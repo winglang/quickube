@@ -1,0 +1,65 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run backend tests
+      run: wing test
+      working-directory: ./backend
+
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Get version
+      id: get_version
+      run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.VERSION }}
+        release_name: Release v${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+
+  build-cli-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: npm ci
+    - name: Create executable
+      run: ./scripts/seapack ./dist/q8s ./dist/q8s-darwin-arm64
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./dist/q8s-darwin-arm64
+        asset_name: q8s-darwin-arm64

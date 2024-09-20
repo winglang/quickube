@@ -7,7 +7,7 @@ bring fs;
 bring tf;
 bring util;
 
-pub struct Q8sClusterSpec {
+pub struct ClusterSpec {
   size: t.Size;
 }
 
@@ -18,8 +18,8 @@ class Providers {
  }
 }
 
-pub class Q8sCluster {
-  new(spec: Q8sClusterSpec) {
+pub class Cluster {
+  new(spec: ClusterSpec) {
     this.installProviders();
 
     let poolBucketName = util.env("QUICK8S_POOL_BUCKET");

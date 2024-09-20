@@ -15,6 +15,9 @@ spec:
       containers:
         - name: echo
           image: hashicorp/http-echo
+          env:
+            - name: ECHO_TEXT
+              value: "Hey Yoav"
           ports:
             - containerPort: 5678
 ---

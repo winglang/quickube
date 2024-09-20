@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+const ncc = require('@vercel/ncc');
+const fs = require('fs/promises');
+const path = require('path');
+const os = require('os');
+const { execSync} = require("child_process");
+const { inject } = require('postject');
+
+const injectBlob = {
+  "darwin-arm64": async ({ executable, buffer }) => {
+    execSync(`codesign --remove-signature ${executable}`);
+    await inject(executable, 'NODE_SEA_BLOB', buffer, {
+      sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
+      machoSegmentName: 'NODE_SEA'
+    });
+    execSync(`codesign --sign - ${executable}`);
+  },
+
+  "linux-x64": async ({ executable, buffer }) => {
+    await inject(executable, 'NODE_SEA_BLOB', buffer, {
+      sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
+    });
+  },
+
+  "win32-x64": async ({ executable, buffer }) => {
+    execSync(`signtool remove /s "${executable}"`);
+    await inject(executable, 'NODE_SEA_BLOB', buffer, {
+      sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
+    });
+    execSync(`signtool sign /fd SHA256 "${executable}"`);
+  }
+};
+
+function usage() {
+  console.error('Usage: seapack <input-file> <output-file>');
+  process.exit(1);
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+
+  if (args.length !== 2) {
+    usage();
+  }
+
+  const inputFile = path.resolve(args[0]);
+  const outputFile = path.resolve(args[1]);
+
+  const tmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'seapack'));
+
+  console.log(`Packaging ${inputFile}...`);
+  const bundleFile = path.join(tmpdir, 'index.js');
+  await bundle(inputFile, bundleFile);
+
+  console.log("Creating single-executable-application (SEA) blob...");
+  const blob = await createBlob(tmpdir, bundleFile);
+
+  // copy the node binary to our tmpdir
+  const nodeBinary = path.join(tmpdir, 'node');
+  await fs.copyFile(process.execPath, nodeBinary);
+
+  const target = `${os.platform()}-${os.arch()}`;
+  const buffer = await fs.readFile(blob);
+
+  const injectBlobFn = injectBlob[target];
+  if (!injectBlobFn) {
+    throw new Error(`Unsupported target ${target}`);
+  }
+
+  console.log(`Creating a ${target} executable...`);
+  await injectBlobFn({ executable: nodeBinary, buffer });
+
+  // move the final binary (nodeBinary) to the output path
+  await fs.rename(nodeBinary, outputFile);
+
+  console.log(`Packaged ${outputFile}`);
+}
+
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});
+
+async function createBlob(tmpdir, bundleFile) {
+  const blob = path.join(tmpdir, 'output.blob');
+  const seaConfig = {
+    main: bundleFile,
+    output: blob,
+    disableExperimentalSEAWarning: true,
+    useSnapshot: false,
+    useCodeCache: true
+  };
+  const seaConfigFile = path.join(tmpdir, 'sea.config.json');
+  await fs.writeFile(seaConfigFile, JSON.stringify(seaConfig, null, 2));
+  execSync(`node --experimental-sea-config ${seaConfigFile}`);
+  return blob;
+}
+
+async function bundle(inputFile, outputFile) {
+  const { code } = await ncc(inputFile);
+  await fs.writeFile(outputFile, code);
+  return outputFile;
+}

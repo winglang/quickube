@@ -20,7 +20,7 @@ pub class CustomDomain {
   new(props: CustomDomainProps) {
     if let apiGw = aws.Api.from(props.api) {
 
-      let domainName = props.cname + "." + props.zoneName;
+      let domainName = "{props.cname}{props.zoneName}";
 
       let domain = new tfaws.apiGatewayDomainName.ApiGatewayDomainName(
         domainName: domainName,
@@ -33,11 +33,14 @@ pub class CustomDomain {
         stageName: apiGw.stageName,
         basePath: "(none)",
       );
-    
+
+      let source = "dnsimple/dnsimple";
+      let version = "1.7.0";
+
       new tf.Provider(
         name: "dnsimple",
-        version: "1.7.0",
-        source: "dnsimple/dnsimple",
+        version: version,
+        source: source,
         attributes: {
           token: util.env("DNSIMPLE_TOKEN"),
           account: props.dnsimpleAccountId, 

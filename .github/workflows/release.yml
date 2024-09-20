@@ -19,8 +19,18 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        VERSION=$(git describe --tags --abbrev=0 --match "v*" | sed 's/^v//')
+        # version format is 1.2.3
+        PREV_VERSION=$(git describe --tags --abbrev=0 --match "v*" | sed 's/^v//')
+
+        # bump the middle number
+        MIDDLE_NUMBER=$(echo $PREV_VERSION | cut -d. -f2)
+        MIDDLE_NUMBER=$((MIDDLE_NUMBER+1))
+        VERSION=$(echo $PREV_VERSION | cut -d. -f1).$(echo $MIDDLE_NUMBER).$(echo $PREV_VERSION | cut -d. -f3)
+        echo "New version: $VERSION"
+
+        # emit as an output
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
 
   test:
     runs-on: ubuntu-latest

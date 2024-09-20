@@ -117,7 +117,7 @@ cat <<EOF > cluster.json
   "publicDns": "$(curl -s $metadata_service/public-hostname)",
   "region": "$region",
   "size": "${tf_q8s_size}",
-  "instanceType": "$(curl -s $metadata_service/instance-type)",
+  "instanceType": "$(curl -s $metadata_service/instance-type)"
 }
 EOF
 

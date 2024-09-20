@@ -2,7 +2,6 @@
   "name": "quick8s",
   "version": "0.0.1",
   "dependencies": {
-    "@aws-sdk/client-auto-scaling": "^3.654.0",
     "@aws-sdk/client-ec2": "^3.654.0",
     "@aws-sdk/client-elastic-load-balancing-v2": "^3.654.0",
     "@aws-sdk/client-route-53": "^3.651.1",

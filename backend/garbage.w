@@ -1,6 +1,7 @@
 bring cloud;
+bring aws;
 
-pub class Garbage {
+pub class Garbage impl std.IHostedLiftable {
   q: cloud.Queue;
 
   new() {
@@ -19,4 +20,16 @@ pub class Garbage {
 
   extern "./garbage.ts"
   static inflight terminateInstance(instanceId: str): void;
+
+  pub onLift(host: std.IInflightHost, ops: Array<str>) {
+    if let fn = aws.Function.from(host) {
+      fn.addPolicyStatements(
+        {
+          effect: aws.Effect.ALLOW,
+          actions: ["ec2:TerminateInstances"],
+          resources: ["*"],
+        },
+      );
+    }
+  }
 }

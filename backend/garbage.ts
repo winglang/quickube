@@ -12,5 +12,8 @@ export const terminateInstance: extern["terminateInstance"] = async (instanceId)
   } catch (error) {
     // TODO: yakk! wing swallows this error so I have no visibility unless I log it here
     console.error(`Error terminating instance ${instanceId}:`, error);
+
+    // we still need to throw to make sure the message goes back to the queue.
+    throw new Error(`Error terminating instance ${instanceId}: ${error}`);
   }
 };

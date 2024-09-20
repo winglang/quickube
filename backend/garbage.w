@@ -13,6 +13,7 @@ pub class Garbage impl std.IHostedLiftable {
       Garbage.terminateInstance(instanceId);
     });
 
+    // TODO: that was not intuitive
     if let fn = aws.Function.from(fn) {
       fn.addPolicyStatements(
         {

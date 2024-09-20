@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Compile wing to tf-aws
-      run: npx wing compile -t tf-aws -t ./platform.static-backend.js
+      run: npx wing compile -t tf-aws -t ./platform.static-backend.js main.w
       working-directory: ./backend
     - name: Terraform init
       run: terraform init

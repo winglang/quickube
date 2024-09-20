@@ -8,21 +8,12 @@ pub class Garbage impl std.IHostedLiftable {
     let q = new cloud.Queue();
     this.q = q;
 
-    q.setConsumer(inflight (instanceId) => {
+    let fn = q.setConsumer(inflight (instanceId) => {
       log("hello, I am terminating instance {instanceId}");
       Garbage.terminateInstance(instanceId);
     });
-  }
-  
-  pub inflight toss(instanceId: str) {
-    this.q.push(instanceId);
-  }
 
-  extern "./garbage.ts"
-  static inflight terminateInstance(instanceId: str): void;
-
-  pub onLift(host: std.IInflightHost, ops: Array<str>) {
-    if let fn = aws.Function.from(host) {
+    if let fn = aws.Function.from(fn) {
       fn.addPolicyStatements(
         {
           effect: aws.Effect.ALLOW,
@@ -32,4 +23,11 @@ pub class Garbage impl std.IHostedLiftable {
       );
     }
   }
+  
+  pub inflight toss(instanceId: str) {
+    this.q.push(instanceId);
+  }
+
+  extern "./garbage.ts"
+  static inflight terminateInstance(instanceId: str): void;
 }

@@ -20,7 +20,7 @@ pub class CustomDomain {
   new(props: CustomDomainProps) {
     if let apiGw = aws.Api.from(props.api) {
 
-      let domainName = "{props.cname}{props.zoneName}";
+      let domainName = "{props.cname}.{props.zoneName}";
 
       let domain = new tfaws.apiGatewayDomainName.ApiGatewayDomainName(
         domainName: domainName,

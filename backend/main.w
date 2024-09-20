@@ -15,7 +15,7 @@ let pool = () => {
   if util.env("WING_TARGET") == "sim" {
     return new b.SimulatedPoolBucket();
   } else {
-    return new b.AwsBucketRef("eladb-quick8s-pool");
+    return new b.AwsBucketRef(util.env("Q8S_POOL_BUCKET"));
   }
 }();
 
@@ -24,23 +24,23 @@ let dns = () => {
     return new d.DnsSimulation();
   } else {
     return new d.Dnsimple(
-      token: new cloud.Secret(name: "DNSIMPLE_TOKEN"),
-      accountId: "137210",
-      domain: "quick8s.sh",
+      token: util.env("DNSIMPLE_TOKEN"),
+      accountId: util.env("DNSIMPLE_ACCOUNT_ID"),
+      domain: util.env("DNSIMPLE_DOMAIN"),
     );
   }
 }();
 
 new a.Api(
-  user: "eladb@wing.cloud",
+  user: util.env("API_USER"),
   clusters: new c.Clusters(),
   names: new names.NameGenerator(),
   pool: new p.Pool(bucket: pool),
   dns: dns,
   customDomain: {
     cname: "api",
-    zoneName: "quick8s.sh",
-    certificateArn: "arn:aws:acm:us-east-1:248020555503:certificate/cfddf2f5-0245-49e6-8676-1e1fa3d1a1d4",
-    dnsimpleAccountId: "137210",
+    zoneName: util.env("DNSIMPLE_DOMAIN"),
+    certificateArn: util.env("CERTIFICATE_ARN"),
+    dnsimpleAccountId: util.env("DNSIMPLE_ACCOUNT_ID"),
   },
 );

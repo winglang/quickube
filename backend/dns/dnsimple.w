@@ -3,7 +3,7 @@ bring cloud;
 bring http;
 
 pub struct DnsimpleProps {
-  token: cloud.Secret;
+  token: str;
   accountId: str;
   domain: str;
 
@@ -22,7 +22,7 @@ pub class Dnsimple impl api.IDns {
 
     let res = http.post(url, {
       headers: {
-        "Authorization": "Bearer {this.props.token.value()}",
+        "Authorization": "Bearer {this.props.token}",
         "Accept": "application/json",
         "Content-Type": "application/json"
       },
@@ -50,7 +50,7 @@ pub class Dnsimple impl api.IDns {
     // First, we need to find the record ID
     let listRes = http.get("{url}?name={name}&type=A", {
       headers: {
-        "Authorization": "Bearer {this.props.token.value()}",
+        "Authorization": "Bearer {this.props.token}",
         "Accept": "application/json",
       }
     });
@@ -67,7 +67,7 @@ pub class Dnsimple impl api.IDns {
         let deleteUrl = "{url}/{record.id}";
         let deleteRes = http.delete(deleteUrl, {
           headers: {
-            "Authorization": "Bearer {this.props.token.value()}",
+            "Authorization": "Bearer {this.props.token}",
             "Accept": "application/json"
           }
         });

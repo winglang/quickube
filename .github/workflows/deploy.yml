@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Production
 
 on:
   push:
@@ -34,6 +34,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}  
       - name: Install dependencies
         run: npm install
       - name: Compile wing to tf-aws
@@ -42,6 +46,6 @@ jobs:
         env:
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
       - run: terraform init
-        working-directory: ./backend/target/tf-aws
+        working-directory: backend/target/main.tfaws
       - run: terraform apply -auto-approve
-        working-directory: ./backend/target/tf-aws
+        working-directory: backend/target/main.tfaws

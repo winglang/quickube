@@ -64,27 +64,22 @@ jobs:
       - create-release
       - determine-version
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - name: Render asset name
-      id: render_asset_name
-      run: |
-        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch}}" >> $GITHUB_OUTPUT
-
-    - name: Install dependencies
-      run: npm install
-    - name: Create executable
-      run: ./scripts/seapack ./cli/q8s ./dist/${{ steps.render_asset_name.outputs.asset_name }}
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/${{ steps.render_asset_name.outputs.asset_name }}
-        asset_name: ${{ steps.render_asset_name.outputs.asset_name }}
-        asset_content_type: application/octet-stream
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm install
+      - name: Create executable
+        run: ./scripts/seapack ./cli/q8s ./dist/q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dist/q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+          asset_name: q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+          asset_content_type: application/octet-stream

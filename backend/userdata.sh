@@ -1,8 +1,4 @@
-#!/bin/sh
-#
-# This script is intended to run on an Amazon Linux EC2 host
-#
-set -euo pipefail
+#!/bin/bash
 
 # Display all commands being executed
 set -x
@@ -24,8 +20,8 @@ sudo usermod -aG docker ec2-user
 newgrp docker
 
 kubectl_version=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-echo "Installing kubectl ${kubectl_version}..."
-curl -LO "https://dl.k8s.io/release/${kubectl_version}/bin/linux/arm64/kubectl"
+echo "Installing kubectl $kubectl_version..."
+curl -LO "https://dl.k8s.io/release/$kubectl_version/bin/linux/arm64/kubectl"
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
@@ -38,8 +34,8 @@ kind delete cluster || true
 reg_name='kind-registry'
 reg_port='5001'
 
-docker rm -f "${reg_name}" || true
-docker run -d --restart=always -p "${reg_port}:5000" --network bridge --name "${reg_name}" registry:2
+docker rm -f "$reg_name" || true
+docker run -d --restart=always -p "$reg_port:5000" --network bridge --name "$reg_name" registry:2
 
 # 2. Create kind cluster with containerd registry config dir enabled
 cat <<EOF | kind create cluster --config=-
@@ -73,17 +69,17 @@ containerdConfigPatches:
 EOF
 
 # 3. Add the registry config to the nodes
-REGISTRY_DIR="/etc/containerd/certs.d/kind-registry:${reg_port}"
+REGISTRY_DIR="/etc/containerd/certs.d/kind-registry:$reg_port"
 for node in $(kind get nodes); do
-  docker exec "${node}" mkdir -p "${REGISTRY_DIR}"
-  cat <<EOF | docker exec -i "${node}" cp /dev/stdin "${REGISTRY_DIR}/hosts.toml"
-[host."http://${reg_name}:5000"]
+  docker exec "$node" mkdir -p "$REGISTRY_DIR"
+  cat <<EOF | docker exec -i "$node" cp /dev/stdin "$REGISTRY_DIR/hosts.toml"
+[host."http://$reg_name:5000"]
 EOF
 done
 
 # 4. Connect the registry to the cluster network if not already connected
-if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${reg_name}")" = 'null' ]; then
-  docker network connect "kind" "${reg_name}"
+if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "$reg_name")" = 'null' ]; then
+  docker network connect "kind" "$reg_name"
 fi
 
 # 5. Document the local registry
@@ -95,9 +91,34 @@ metadata:
   namespace: kube-public
 data:
   localRegistryHosting.v1: |
-    host: "kind-registry:${reg_port}"
+    host: "kind-registry:$reg_port"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
 # Deploy nginx ingress controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+# OK, we have a cluster, let's put it in the pool bucket
+
+kubeconfig_file="./kubeconfig.yaml"
+kind export kubeconfig --kubeconfig $kubeconfig_file
+kubeconfig="$(cat $kubeconfig_file | base64 -w0)"
+
+metadata_service="http://169.254.169.254/latest/meta-data"
+instance_id="$(curl -s $metadata_service/instance-id)"
+region="$(curl -s $metadata_service/placement/region)"
+
+cat <<EOF > cluster.json
+{
+  "provider": "aws",
+  "kubeconfig": "$kubeconfig",
+  "instanceId": "$instance_id",
+  "publicIp": "$(curl -s $metadata_service/public-ipv4)",
+  "publicDns": "$(curl -s $metadata_service/public-hostname)",
+  "region": "$region",
+  "size": "${tf_q8s_size}",
+  "instanceType": "$(curl -s $metadata_service/instance-type)",
+}
+EOF
+
+aws s3 cp cluster.json "s3://${tf_q8s_pool_bucket}/aws/$region/${tf_q8s_size}/$instance_id.json"

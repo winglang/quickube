@@ -4,15 +4,11 @@ bring "cdktf" as cdktf;
 bring aws;
 bring "./bucket.w" as b;
 
-pub struct PoolProps {
-  bucket: b.IBucket;
-}
-
 pub class Pool {
-  bucket: b.IBucket;
+  pub bucket: cloud.Bucket;
 
-  new(props: PoolProps) {
-    this.bucket = props.bucket;
+  new() {
+    this.bucket = new cloud.Bucket();
   }
 
   pub inflight tryAlloc(options: t.ClusterAttributes): t.Host? {

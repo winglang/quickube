@@ -46,12 +46,8 @@ pub struct Host extends ClusterAttributes {
   instanceId: str;
   publicIp: str;
   publicDns: str;
-  
-  // targetGroupArn: str;
-  sshPrivateKey: str;
   kubeconfig: str;
-  registryPassword: str;
-  instanceType: InstanceType;
+  instanceType: str;
 }
 
 pub struct ClusterList {

@@ -6,18 +6,10 @@ bring "./api.w" as a;
 bring "./pool.w" as p;
 bring "./bucket.w" as b;
 bring "./dns" as d;
-bring aws;
+bring "./capacity.w" as cp;
 bring util;
 
-// TODO: yakk!
-
-let pool = () => {
-  if util.env("WING_TARGET") == "sim" {
-    return new b.SimulatedPoolBucket();
-  } else {
-    return new b.AwsBucketRef(util.env("Q8S_POOL_BUCKET"));
-  }
-}();
+let pool = new p.Pool();
 
 let dns = () => {
   if util.env("WING_TARGET") == "sim" {
@@ -31,11 +23,29 @@ let dns = () => {
   }
 }();
 
+new cp.Capacity(
+  size: t.Size.small,
+  count: 5,
+  pool: pool.bucket,
+) as "SmallCapacity";
+
+new cp.Capacity(
+  size: t.Size.medium,
+  count: 3,
+  pool: pool.bucket,
+) as "MediumCapacity";
+
+new cp.Capacity(
+  size: t.Size.large,
+  count: 2,
+  pool: pool.bucket,
+) as "LargeCapacity";
+
 new a.Api(
   user: util.env("API_USER"),
   clusters: new c.Clusters(),
   names: new names.NameGenerator(),
-  pool: new p.Pool(bucket: pool),
+  pool: pool,
   dns: dns,
   customDomain: {
     cname: "api",

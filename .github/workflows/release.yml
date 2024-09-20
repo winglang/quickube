@@ -73,8 +73,7 @@ jobs:
     - name: Render asset name
       id: render_asset_name
       run: |
-        platform=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)
-        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${platform}" >> $GITHUB_OUTPUT
+        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch}}" >> $GITHUB_OUTPUT
 
     - name: Install dependencies
       run: npm install

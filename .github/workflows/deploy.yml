@@ -28,17 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-backend
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Install dependencies
-      run: npm install
-    - name: Compile wing to tf-aws
-      run: npx wing compile -t tf-aws -t ./platform.static-backend.js main.w
-      working-directory: ./backend
-    - name: Terraform init
-      run: terraform init
-      working-directory: ./backend/target/tf-aws
-    - name: Terraform apply
-      run: terraform apply -auto-approve
-      working-directory: ./backend/target/tf-aws
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Compile wing to tf-aws
+        run: npx wing compile -t tf-aws -t ./platform.static-backend.js main.w
+        working-directory: ./backend
+        env:
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+      - run: terraform init
+        working-directory: ./backend/target/tf-aws
+      - run: terraform apply -auto-approve
+        working-directory: ./backend/target/tf-aws

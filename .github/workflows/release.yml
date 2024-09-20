@@ -13,17 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.VERSION }}
-      platform: ${{ steps.get_platform.outputs.PLATFORM }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         fetch-tags: true
-    - name: Get platform
-      id: get_platform
-      run: |
-        echo "PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)" >> $GITHUB_OUTPUT
     - name: Get version
       id: get_version
       run: |
@@ -39,8 +34,7 @@ jobs:
         # emit as an output
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-
-  test:
+  test-backend:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -55,13 +49,22 @@ jobs:
       run: npx wing test
       working-directory: ./backend
 
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs:
+      - test-backend
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Deploy backend
+      run: npx wing deploy
+
   create-release:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     needs:
       - determine-version
-      - test
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -95,7 +98,7 @@ jobs:
     - name: Render asset name
       id: render_asset_name
       run:
-        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${{ needs.determine-version.outputs.platform }}" >> $GITHUB_OUTPUT
+        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${platform}" >> $GITHUB_OUTPUT
 
     - name: Install dependencies
       run: npm install

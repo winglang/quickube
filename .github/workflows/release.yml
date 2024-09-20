@@ -41,6 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+    needs:
+      - determine-version
+      - build
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -55,8 +58,11 @@ jobs:
         draft: false
         prerelease: false
 
-  build-cli-macos:
+
+  release-cli-macos:
     runs-on: macos-latest
+    needs:
+      - create-release
     steps:
     - name: Checkout code
       uses: actions/checkout@v3

@@ -66,12 +66,12 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Create executable
-      run: ./scripts/seapack ./cli/q8s ./dist/q8s-darwin-arm64
+      run: ./scripts/seapack ./cli/q8s ./dist/q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/q8s-darwin-arm64
-        asset_name: q8s-darwin-arm64
+        asset_path: ./dist/q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}
+        asset_name: q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}

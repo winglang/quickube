@@ -56,8 +56,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Deploy backend
-      run: npx wing deploy
+    - name: Compile wing to tf-aws
+      run: npx wing compile -t tf-aws -t ./platform.static-backend.js
+      working-directory: ./backend
+    - name: Terraform init
+      run: terraform init
+      working-directory: ./backend/target/tf-aws
+    - name: Terraform apply
+      run: terraform apply -auto-approve
+      working-directory: ./backend/target/tf-aws
 
   create-release:
     runs-on: ubuntu-latest
@@ -97,7 +104,8 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: Render asset name
       id: render_asset_name
-      run:
+      run: |
+        platform=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)
         echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${platform}" >> $GITHUB_OUTPUT
 
     - name: Install dependencies

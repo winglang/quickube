@@ -15,7 +15,7 @@ jobs:
       version: ${{ steps.get_version.outputs.VERSION }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         fetch-tags: true
@@ -39,9 +39,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
     - name: Install dependencies
@@ -59,7 +59,7 @@ jobs:
       - test
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -73,26 +73,31 @@ jobs:
 
 
   release-cli-macos:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
     needs:
       - create-release
       - determine-version
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
     - name: Install dependencies
       run: npm install
     - name: Create executable
-      run: ./scripts/seapack ./cli/q8s ./dist/q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}
+      run: ./scripts/seapack ./cli/q8s ./dist/q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}
-        asset_name: q8s-darwin-arm64-v${{ needs.determine-version.outputs.version }}
+        asset_path: ./dist/q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
+        asset_name: q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
+        asset_content_type: application/octet-stream

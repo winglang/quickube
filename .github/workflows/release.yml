@@ -13,12 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.VERSION }}
+      platform: ${{ steps.get_platform.outputs.PLATFORM }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         fetch-tags: true
+    - name: Get platform
+      id: get_platform
+      run: |
+        echo "PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)" >> $GITHUB_OUTPUT
     - name: Get version
       id: get_version
       run: |
@@ -71,8 +76,7 @@ jobs:
         draft: false
         prerelease: false
 
-
-  release-cli-macos:
+  release-cli:
     strategy:
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
@@ -88,16 +92,21 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
+    - name: Render asset name
+      id: render_asset_name
+      run:
+        echo "asset_name=q8s-${{ needs.determine-version.outputs.platform }}-v${{ needs.determine-version.outputs.version }}" >> $GITHUB_OUTPUT
+
     - name: Install dependencies
       run: npm install
     - name: Create executable
-      run: ./scripts/seapack ./cli/q8s ./dist/q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
+      run: ./scripts/seapack ./cli/q8s ./dist/${{ steps.render_asset_name.outputs.asset_name }}
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./dist/q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
-        asset_name: q8s-${{ matrix.platform }}-v${{ needs.determine-version.outputs.version }}
+        asset_path: ./dist/${{ steps.render_asset_name.outputs.asset_name }}
+        asset_name: ${{ steps.render_asset_name.outputs.asset_name }}
         asset_content_type: application/octet-stream

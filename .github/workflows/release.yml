@@ -6,6 +6,21 @@ on:
       - main
 
 jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Get version
+      id: get_version
+      run: |
+        VERSION=$(git describe --tags --abbrev=0 --match "v*" | sed 's/^v//')
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -28,17 +43,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    - name: Get version
-      id: get_version
-      run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.get_version.outputs.VERSION }}
-        release_name: Release v${{ steps.get_version.outputs.VERSION }}
+        tag_name: v${{ needs.determine-version.outputs.version }}
+        release_name: Release v${{ needs.determine-version.outputs.version }}
         draft: false
         prerelease: false
 
@@ -54,7 +66,7 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Create executable
-      run: ./scripts/seapack ./dist/q8s ./dist/q8s-darwin-arm64
+      run: ./scripts/seapack ./cli/q8s ./dist/q8s-darwin-arm64
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:

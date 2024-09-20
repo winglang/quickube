@@ -71,6 +71,7 @@ async function main() {
   await injectBlobFn({ executable: nodeBinary, buffer });
 
   // move the final binary (nodeBinary) to the output path
+  await fs.mkdir(path.dirname(outputFile), { recursive: true });
   await fs.rename(nodeBinary, outputFile);
 
   console.log(`Packaged ${outputFile}`);

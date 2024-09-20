@@ -95,7 +95,7 @@ jobs:
     - name: Render asset name
       id: render_asset_name
       run:
-        echo "asset_name=q8s-${{ needs.determine-version.outputs.platform }}-v${{ needs.determine-version.outputs.version }}" >> $GITHUB_OUTPUT
+        echo "asset_name=q8s-v${{ needs.determine-version.outputs.version }}-${{ needs.determine-version.outputs.platform }}" >> $GITHUB_OUTPUT
 
     - name: Install dependencies
       run: npm install

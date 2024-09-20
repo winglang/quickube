@@ -1,4 +1,8 @@
-# Quick8s User Story
+# Quick8s *(pronounced "quick eights")*
+
+> Access a managed Kubernetes cluster for experimentation, development and testing in seconds.
+
+## Getting started
 
 ### Install the CLI
 

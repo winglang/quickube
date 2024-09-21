@@ -81,15 +81,16 @@ pub class Api {
       };
 
       if let host = pool.tryAlloc(attributes) {
-        let name = names.next();
+        let subdomain = names.next();
 
-        log("Adding host mapping: {name} => {host.publicIp}");
-        let hostname = this.dns.addARecord(name, host.publicIp);
+        log("Adding host mapping: {subdomain} => {host.publicIp}");
+        let hostname = this.dns.addARecord(subdomain, host.publicIp);
 
         // mangle the kubeconfig to match our new hostname
         let kubeconfig = kc.renderKubeConfig(host.kubeconfig, hostname: hostname);
-        let cluster: t.Cluster = { 
-          name, 
+
+        let cluster: t.Cluster = {
+          name: hostname,
           hostname, 
           kubeconfig, 
           host: host,
@@ -128,8 +129,11 @@ pub class Api {
         
     api.delete("/clusters/:name", inflight (req) => {
       if let name = req.vars.tryGet("name") {
+        log("Deleting cluster: {name}");
+
         if let existing = clusters.tryGet(user, name) {
-          this.dns.removeARecord(existing.name, existing.host.publicIp);
+          let subdomain = existing.hostname.split(".")[0]; // remove the domain
+          this.dns.removeARecord(subdomain, existing.host.publicIp);
           let deleted = clusters.delete(user, name);
           props.garbage.toss(existing.host.instanceId);
           return statusOk({ name, deleted });

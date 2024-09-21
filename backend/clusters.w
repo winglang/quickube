@@ -9,7 +9,7 @@ pub class Clusters {
   }
 
   pub inflight put(user: str, cluster: t.Cluster) {
-    let key = this.keyFor(user, cluster.name);
+    let key = this.keyFor(user, cluster.hostname);
 
     // TODO: yakk!
     this.store.putJson(key, unsafeCast(cluster));
@@ -20,7 +20,7 @@ pub class Clusters {
     let result = MutArray<str>[];
     for key in keys {
       let json = this.store.getJson(key);
-      result.push(t.Cluster.fromJson(json).name);
+      result.push(t.Cluster.fromJson(json).hostname);
     }
 
     return result.copy();

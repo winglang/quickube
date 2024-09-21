@@ -23,7 +23,7 @@ pub class Util {
 
     kubeconfig.set("contexts", [
       {
-        "name": name,
+        "name": props.hostname,
         "context": {
           "cluster": name,
           "user": name

@@ -87,7 +87,7 @@ pub class Api {
         let hostname = this.dns.addARecord(name, host.publicIp);
 
         // mangle the kubeconfig to match our new hostname
-        let kubeconfig = kc.renderKubeConfig(host.kubeconfig, name: name, hostname: hostname);
+        let kubeconfig = kc.renderKubeConfig(host.kubeconfig, hostname: hostname);
         let cluster: t.Cluster = { 
           name, 
           hostname, 

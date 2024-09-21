@@ -2,13 +2,12 @@ bring fs;
 bring util;
 
 struct ClusterProps {
-  name: str;
   hostname: str;
 }
 
 pub class Util {
   pub static inflight renderKubeConfig(base64: str, props: ClusterProps): Json {
-    let name = props.name;
+    let hostname = props.hostname;
     let tmpdir = fs.mkdtemp();
     let tmpfile = fs.join(tmpdir, "kubeconfig.yaml");
     fs.writeFile(tmpfile, util.base64Decode(base64));
@@ -16,25 +15,25 @@ pub class Util {
     fs.remove(tmpdir);
 
     let clusterCfg = kubeconfig.get("clusters").getAt(0);
-    clusterCfg.get("cluster").set("server", "https://{props.hostname}:7443");
+    clusterCfg.get("cluster").set("server", "https://{hostname}:7443");
     clusterCfg.get("cluster").delete("certificate-authority-data");
     clusterCfg.get("cluster").set("insecure-skip-tls-verify", true);
-    clusterCfg.set("name", name);
+    clusterCfg.set("name", hostname);
 
     kubeconfig.set("contexts", [
       {
-        "name": props.hostname,
+        "name": hostname,
         "context": {
-          "cluster": name,
-          "user": name
+          "cluster": hostname,
+          "user": hostname
         },
       }
     ]);
 
-    kubeconfig.set("current-context", name);
+    kubeconfig.set("current-context", hostname);
 
     let userCfg = kubeconfig.get("users").getAt(0);
-    userCfg.set("name", name);
+    userCfg.set("name", hostname);
     
     return Json.deepCopy(kubeconfig);
   }

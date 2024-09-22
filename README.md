@@ -6,6 +6,16 @@
 
 ### Install the CLI
 
+> We will make this easier, do not fear.
+
+1. Go to [releases](https://github.com/winglang/quickube/releases) and find the latest release.
+2. Download the latest release to your box (since this is still a private GH repo, it's easiest to do it from the GitHub UI).
+3. Install to 
+
+```sh
+$ curl -o qkube https://github.com/winglang/quickube/releases/download/v0.29.1/qkube-v0.29.1-macOS-ARM64
+```
+
 ```console
 $ curl https://get.quickube.sh | sh
 qkube installed.
@@ -258,6 +268,16 @@ Response:
 }
 ```
 
+## Development
+
+### Launching a single instance for tests
+
+```sh
+cd scripts/launch-instance
+./launch.sh
+```
+
+(you'll need AWS creds in your environment)
 
 ## Roadmap
 

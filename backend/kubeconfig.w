@@ -5,7 +5,7 @@ struct ClusterProps {
   hostname: str;
 }
 
-pub class Util {
+internal class Util {
   pub static inflight renderKubeConfig(base64: str, props: ClusterProps): Json {
     let hostname = props.hostname;
     let tmpdir = fs.mkdtemp();

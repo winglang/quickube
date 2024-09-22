@@ -126,7 +126,7 @@ pub class Capacity {
       blockDeviceMappings: [{
         deviceName: "/dev/xvda",
         ebs: {
-          volumeSize: 8,
+          volumeSize: 128,
           volumeType: "gp2",
           deleteOnTermination: true,
         },

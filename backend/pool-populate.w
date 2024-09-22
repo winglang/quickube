@@ -2,7 +2,7 @@ bring fs;
 bring "./pool.w" as p;
 bring "./types.w" as t;
 
-pub class Util {
+internal class Util {
   pub static populate(pool: p.Pool) {
     let fixture = fs.readJson("{@dirname}/fixtures/host.json");
     let kubeconfigBase64 = fixture.get("kubeconfig").asStr();

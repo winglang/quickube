@@ -57,7 +57,8 @@ jobs:
   release-cli:
     strategy:
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        # platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.platform }}
 
     needs:

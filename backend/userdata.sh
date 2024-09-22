@@ -116,9 +116,9 @@ cat <<EOF > cluster.json
   "publicIp": "$(curl -s $metadata_service/public-ipv4)",
   "publicDns": "$(curl -s $metadata_service/public-hostname)",
   "region": "$region",
-  "size": "${tf_q8s_size}",
+  "size": "${tf_qkube_size}",
   "instanceType": "$(curl -s $metadata_service/instance-type)"
 }
 EOF
 
-aws s3 cp cluster.json "s3://${tf_q8s_pool_bucket}/aws/$region/${tf_q8s_size}/$instance_id.json"
+aws s3 cp cluster.json "s3://${tf_qkube_pool_bucket}/aws/$region/${tf_qkube_size}/$instance_id.json"

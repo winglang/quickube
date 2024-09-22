@@ -1,5 +1,5 @@
 {
-  "name": "quick8s",
+  "name": "quickube",
   "version": "0.0.1",
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.654.0",

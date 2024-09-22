@@ -1,4 +1,4 @@
-const baseurl = process.env.QUICK8S_URL ?? "https://api.quick8s.sh";
+const baseurl = process.env.QKUBE_URL ?? "https://api.quickube.sh";
 
 async function req(method, pathname, body = undefined) {
   const url = `${baseurl}${pathname}`;

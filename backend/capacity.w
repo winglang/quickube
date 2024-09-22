@@ -36,7 +36,7 @@ pub class Capacity {
     let instanceType = this.findInstanceType(props.size);
 
     let securityGroup = new aws.securityGroup.SecurityGroup(
-      description: "quick8s security group",
+      description: "quickube security group",
       vpcId: vpcId,
 
       // allow all egress
@@ -61,8 +61,8 @@ pub class Capacity {
     let size: str = unsafeCast(instanceType.size);
 
     let userData = cdktf.Fn.templatefile("{@dirname}/userdata.sh", {
-      tf_q8s_pool_bucket: poolBucketName,
-      tf_q8s_size: size,
+      tf_qkube_pool_bucket: poolBucketName,
+      tf_qkube_size: size,
     });
 
     let user = "ec2-user";
@@ -113,7 +113,7 @@ pub class Capacity {
     );
 
     let launchTemplate = new aws.launchTemplate.LaunchTemplate(
-      namePrefix: "quick8s-{props.size}-",
+      namePrefix: "quickube-{props.size}-",
       imageId: ami.id,
       instanceType: instanceType.name,
       keyName: keypair.keyName,
@@ -140,13 +140,13 @@ pub class Capacity {
       tagSpecifications: [{
         resourceType: "instance",
         tags: {
-          Name: "quick8s/{props.size}",
+          Name: "qkube/{props.size}",
         },
       }],
     );
 
     let asg = new aws.autoscalingGroup.AutoscalingGroup(
-      name: "quick8s-{props.size}",
+      name: "quickube-{props.size}",
       vpcZoneIdentifier: [subnetId],
       desiredCapacity: props.count ?? 1,
       minSize: props.count ?? 1,

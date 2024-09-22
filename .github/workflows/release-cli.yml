@@ -73,13 +73,13 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Create executable
-        run: ./scripts/seapack ./cli/q8s ./dist/q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+        run: ./scripts/seapack ./cli/qkube ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-          asset_name: q8s-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+          asset_path: ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+          asset_name: qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
           asset_content_type: application/octet-stream

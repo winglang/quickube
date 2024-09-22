@@ -87,7 +87,7 @@ async function main(args) {
 }
 
 function usage(code) {
-  console.log("Usage: q8s COMMAND");
+  console.log("Usage: qkube COMMAND");
   console.log("");
   console.log("Commands:");
   console.log("  new\tCreates a new cluster");

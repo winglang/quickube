@@ -1,29 +1,29 @@
-# Quick8s *(pronounced "quick eights")*
+# quickube
 
-> Access a managed Kubernetes cluster for experimentation, development and testing in seconds.
+> Instan Kubernetes clusters for prototypes, experimentation, development and testing.
 
 ## Getting started
 
 ### Install the CLI
 
 ```console
-$ curl https://get.quick8s.sh | sh
-q8s installed.
-$ q8s --version
+$ curl https://get.quickube.sh | sh
+qkube installed.
+$ qkube --version
 v0.34.0
 ```
 
 ### Login
 
 ```console
-$ q8s login
+$ qkube login
 <opens browser, GitHub/Google login/signup>
 ```
 
 ### Create a new cluster
 
 ```console
-$ q8s new
+$ qkube new
 Created cluster "fimble-shimble" of size medium (5000mcpu, 128GiB).
 Using cluster "fimble-shimble" as your default kubectl context.
 ```
@@ -38,7 +38,7 @@ $ kubectl get all
 You can also request a different size:
 
 ```console
-$ q8s new --size small
+$ qkube new --size small
 Creating new cluster "dinker-pinker" of size small (1000mcpu, 64GiB)...
 Using cluster "dinker-pinker" as your default kubectl context.
 ```
@@ -46,13 +46,13 @@ Using cluster "dinker-pinker" as your default kubectl context.
 Other options:
 
 ```console
-$ q8s new --region us-east-1 --provider aws
+$ qkube new --region us-east-1 --size small
 ```
 
 ### List all my clusters
 
 ```console
-$ q8s ls
+$ qkube ls
   fimble-shimble medium
 * dinker-pinker  small
   bangly-pangly  small
@@ -61,14 +61,14 @@ $ q8s ls
 ### Switch clusters
 
 ```console
-$ q8s use bangly-pangly
+$ qkube use bangly-pangly
 Cluster "bangly-pangly" is now your default kubectl context.
 ```
 
 ### Delete a cluster
 
 ```console
-$ q8s rm bangly-pangly
+$ qkube rm bangly-pangly
 Cluster "bangly-pangly" is gone forever.
 ```
 
@@ -77,13 +77,13 @@ Cluster "bangly-pangly" is gone forever.
 ```dockerfile
 # Dockerfile
 FROM hashicorp/http-echo
-ENV ECHO_TEXT "Hello, quick8s!"
+ENV ECHO_TEXT "Hello, quickube!"
 ```
 
 ```console
-$ docker build -t dinker-pinker.quick8s.sh/echo .
-$ k8s registry password | docker login dinker-pinker.quick8s.sh -u admin --password-stdin
-$ docker push dinker-pinker.quick8s.sh/echo
+$ docker build -t dinker-pinker.quickube.sh/echo .
+$ k8s registry password | docker login dinker-pinker.quickube.sh -u admin --password-stdin
+$ docker push dinker-pinker.quickube.sh/echo
 ```
 
 ### Deploy a service with public access
@@ -106,7 +106,7 @@ spec:
     spec:
       containers:
         - name: echo
-          image: dinker-pinker.quick8s.sh/echo:latest
+          image: dinker-pinker.quickube.sh/echo:latest
           ports:
             - containerPort: 5678
 ---
@@ -147,8 +147,8 @@ $ kubectl apply -f manifest.yaml
 And now it can be accessed from the internets *via HTTPS* :-):
 
 ```console
-$ curl https://dinker-pinker.quick8s.sh/echo
-Hello, quick8s!
+$ curl https://dinker-pinker.quickube.sh/echo
+Hello, quickube!
 ```
 
 ### Collaboration
@@ -156,8 +156,8 @@ Hello, quick8s!
 Create an invite URL for a cluster:
 
 ```console
-$ q8s invite bangly-pangly
-https://quick8s.sh/join/bangly-pangly?key=xosdfkjsdf39dfjhsdf9l
+$ qkube invite bangly-pangly
+https://quickube.sh/join/bangly-pangly?key=xosdfkjsdf39dfjhsdf9l
 ```
 
 Invitee clicks the link, logs in, and the cluster is added to their account.
@@ -165,7 +165,7 @@ Invitee clicks the link, logs in, and the cluster is added to their account.
 Now, it's just there:
 
 ```sh
-$ q8s use bangly-pangly
+$ qkube use bangly-pangly
 Using cluster "bangly-pangly" as your default kubectl context.
 ```
 
@@ -254,7 +254,7 @@ Response:
 
 ```json
 {
-  "invite": "https://quick8s.sh/join/bangly-pangly?key=xosdfkjsdf39dfjhsdf9l"
+  "invite": "https://quickube.sh/join/bangly-pangly?key=xosdfkjsdf39dfjhsdf9l"
 }
 ```
 

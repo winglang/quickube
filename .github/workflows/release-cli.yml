@@ -81,33 +81,33 @@ jobs:
         asset_name: qkube-v${{ needs.determine-version.outputs.version }}.js
         asset_content_type: application/javascript
 
-  release-cli:
-    strategy:
-      matrix:
-        # platform: [macos-latest, ubuntu-latest, windows-latest]
-        platform: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
+  # release-cli:
+  #   strategy:
+  #     matrix:
+  #       # platform: [macos-latest, ubuntu-latest, windows-latest]
+  #       platform: [macos-latest, ubuntu-latest]
+  #   runs-on: ${{ matrix.platform }}
 
-    needs:
-      - create-release
-      - determine-version
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Install dependencies
-        run: npm install
-      - name: Create executable
-        run: ./scripts/seapack ./cli/qkube ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-          asset_name: qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-          asset_content_type: application/octet-stream
+  #   needs:
+  #     - create-release
+  #     - determine-version
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #     - name: Install dependencies
+  #       run: npm install
+  #     - name: Create executable
+  #       run: ./scripts/seapack ./cli/qkube ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+  #     - name: Upload Release Asset
+  #       uses: actions/upload-release-asset@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         upload_url: ${{ needs.create-release.outputs.upload_url }}
+  #         asset_path: ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+  #         asset_name: qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
+  #         asset_content_type: application/octet-stream

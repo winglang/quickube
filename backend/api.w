@@ -74,15 +74,21 @@ pub class Api {
       }
     
       let options = t.ClusterOptions.parseJson(body);
+
       let attributes = t.ClusterAttributes {
         provider: options.provider ?? t.Defaults.provider(),
         region: options.region ?? t.Defaults.region(),
         size: options.size ?? t.Defaults.size()
       };
 
-      if let host = pool.tryAlloc(attributes) {
-        let subdomain = names.next();
+      let subdomain = options.name ?? names.next();
 
+      // check if this subdomain is available
+      if this.dns.tryFindARecord(subdomain) != nil {
+        return statusError(409, "Cluster name '{subdomain}' not available");
+      }
+
+      if let host = pool.tryAlloc(attributes) {
         log("Adding host mapping: {subdomain} => {host.publicIp}");
         let hostname = this.dns.addARecord(subdomain, host.publicIp);
 

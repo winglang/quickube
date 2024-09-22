@@ -279,3 +279,21 @@ test "get non existing cluster" {
     error: "Cluster 'q8s-0.dummy.com' not found"
   });
 }
+
+test "create a cluster with a custom name" {
+  let response = http.post("{api.url}/clusters", body: Json.stringify({
+    name: "bangbang",
+  }));
+
+  expect.equal(response.status, 200);
+  expect.equal(Json.parse(response.body).get("name"), "bangbang.dummy.com");
+}
+
+test "create a cluster with a custom name that already exists" {
+  let r1 = http.post("{api.url}/clusters", body: Json.stringify({ name: "myname" }));
+  expect.equal(r1.status, 200);
+  
+  let r2 = http.post("{api.url}/clusters", body: Json.stringify({ name: "myname" }));
+  expect.equal(r2.status, 409);
+  expect.equal(Json.parse(r2.body).get("error"), "Cluster name 'myname' not available");
+}

@@ -42,9 +42,7 @@ pub class Dnsimple impl api.IDns {
     return hostname;
   }
 
-
-  pub inflight removeARecord(name: str, ip: str): void {
-
+  pub inflight tryFindARecord(name: str): api.Record? {
     let url = "https://api.dnsimple.com/v2/{this.props.accountId}/zones/{this.props.domain}/records";
 
     // First, we need to find the record ID
@@ -61,30 +59,33 @@ pub class Dnsimple impl api.IDns {
 
     // TODO: yakk!
     let response = GetRecordsResponse.parseJson(listRes.body);
+    if response.data.length == 0 {
+      return nil;
+    }
 
-    for record in response.data {
-      if record.name == name && record.type == "A" && record.content == ip {
-        let deleteUrl = "{url}/{record.id}";
-        let deleteRes = http.delete(deleteUrl, {
-          headers: {
-            "Authorization": "Bearer {this.props.token}",
-            "Accept": "application/json"
-          }
-        });
+    return response.data[0];
+  }
 
+  pub inflight removeARecord(name: str, ip: str): void {
+    if let record = this.tryFindARecord(name) {
+
+      // if the IP is the same, we don't need to do anything
+      if record.content != ip {
         return;
       }
+
+      let deleteUrl = "https://api.dnsimple.com/v2/{this.props.accountId}/zones/{this.props.domain}/records/{record.id}";
+
+      http.delete(deleteUrl, {
+        headers: {
+          "Authorization": "Bearer {this.props.token}",
+          "Accept": "application/json"
+        }
+      });
     }
   }
 }
 
 struct GetRecordsResponse {
-  data: Array<Record>;
-}
-
-struct Record {
-  id: num;
-  name: str;
-  type: str;
-  content: str;
+  data: Array<api.Record>;
 }

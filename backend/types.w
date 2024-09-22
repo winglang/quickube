@@ -23,6 +23,7 @@ pub enum Provider {
 }
 
 pub struct ClusterOptions {
+  name: str?;
   size: Size?;
   region: str?;
   provider: Provider?;

@@ -9,21 +9,20 @@
 > We will make this easier, do not fear.
 
 1. Go to [releases](https://github.com/winglang/quickube/releases) and find the latest release.
-2. Download the latest release to your box (since this is still a private GH repo, it's easiest to do it from the GitHub UI).
-3. Install to 
+2. Download the latest ".js" release
+3. Install to `/usr/local/bin`:
 
-```sh
-$ curl -o qkube https://github.com/winglang/quickube/releases/download/v0.29.1/qkube-v0.29.1-macOS-ARM64
-```
+    ```sh
+    $ sudo mv ~/Download/qkube-v0.32.1.js /usr/local/bin/qkube
+    $ sudo chmod +x /usr/local/bin/qkube
+    $ qkube ls
+    ```
 
-```console
-$ curl https://get.quickube.sh | sh
-qkube installed.
-$ qkube --version
-v0.34.0
-```
+Have fun!
 
 ### Login
+
+> Not relevant right now
 
 ```console
 $ qkube login
@@ -53,10 +52,10 @@ Creating new cluster "dinker-pinker" of size small (1000mcpu, 64GiB)...
 Using cluster "dinker-pinker" as your default kubectl context.
 ```
 
-Other options:
+You can request a cluster with a specific name:
 
 ```console
-$ qkube new --region us-east-1 --size small
+$ qkube new --name my-bangbang-cluster
 ```
 
 ### List all my clusters

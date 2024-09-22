@@ -22,4 +22,18 @@ pub class DnsSimulation impl api.IDns {
     let hostname = "{name}.dummy.com";
     this.records.delete(hostname);
   }
+
+  pub inflight tryFindARecord(name: str): api.Record? {
+    let hostname = "{name}.dummy.com";
+    if let ip = this.records.tryGet(hostname) {
+      return {
+        name: name,
+        content: ip,
+        type: "A",
+        id: 1111
+      };
+    }
+
+    return nil;
+  }
 }

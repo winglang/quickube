@@ -1,6 +1,6 @@
 # quickube
 
-> Instan Kubernetes clusters for prototypes, experimentation, development and testing.
+> Instant Kubernetes clusters for prototypes, experimentation, development and testing.
 
 ## Getting started
 

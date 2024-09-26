@@ -5,6 +5,6 @@ let pool = new cloud.Bucket();
 
 new b.Capacity(
   size: b.Size.small,
-  count: 1,
+  count: 2,
   pool: pool,
 );

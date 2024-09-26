@@ -113,6 +113,50 @@ pub class Api {
         return statusError(503, "No available clusters that match the request: {Json.stringify(attributes)}");
       }
     });
+
+    api.post("/cluster/:name/recycle", inflight (req) => {
+      // TODO: yakk!!
+      let var body = req.body!;
+      if req.body == "" || req.body == nil {
+        body = Json.stringify({});
+      }
+    
+      let options = t.ClusterOptions.parseJson(body);
+
+      if let name = req.vars.tryGet("name") {
+        if let c = clusters.tryGet(user, name) {
+          let oldHost = c.host;
+
+          let attributes = t.ClusterAttributes {
+            provider: options.provider ?? c.provider,
+            region: options.region ?? c.region,
+            size: options.size ?? c.size
+          };
+    
+          if let newHost = pool.tryAlloc(attributes) {
+
+
+            // TODO: this is not working because our instances do not have an elastic ip associated with them for now
+            // we need to add a lifecycle hook to the autoscaling group to associate an elastic ip with the instance
+            // when it is created and only then we will be able to preserve the ip across instance recycling
+            // >> ec2.switchElasticIp(oldHost, newHost);
+
+
+
+          } else {
+            return statusError(409, "No capacity available to recycle {name}");
+          }
+           
+
+          props.garbage.toss(c.host.instanceId);
+          return statusOk({ name, recycled: true });
+        } else {
+          return statusError(404, "Cluster '{name}' not found");
+        }
+      } else {
+        return statusError(400, "Cluster name is required");
+      }
+    });
     
     api.get("/clusters", inflight () => {
       // TODO: yak!

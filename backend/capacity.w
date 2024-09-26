@@ -158,6 +158,61 @@ pub class Capacity {
       },
     );
 
+    let instanceLaunching = new cloud.Topic();
+    let instanceLaunchingSnsTopic = awsw.Topic.from(instanceLaunching)!;
+    let instanceLaunchingHandler = new cloud.Function(inflight () => {
+
+    });
+    let instanceLaunchingHandlerFunction = awsw.Function.from(instanceLaunchingHandler)!;
+    
+    let hookRole = new aws.iamRole.IamRole(
+      assumeRolePolicy: Json.stringify({
+        Version: "2012-10-17",
+        Statement: [{
+          Effect: "Allow",
+          Action: "sts:AssumeRole",
+          Principal: {
+            Service: "autoscaling.amazonaws.com",
+          },
+        }],
+      }),
+      inlinePolicy: Json.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Action: [
+              "autoscaling:CompleteLifecycleAction",
+              "autoscaling:DescribeAutoScalingInstances"
+            ],
+            Resource: "*",
+          },
+          {
+            Effect: "Allow",
+            Action: "sns:Publish",
+            Resource: instanceLaunchingSnsTopic.topicArn,
+          },
+          {
+            Effect: "Allow",
+            Action: "lambda:InvokeFunction",
+            Resource: instanceLaunchingHandlerFunction.functionArn,
+          }
+        ],
+      }),
+    ) as "hook-role";
+
+    // define a lifecycle hook to the autoscaling group to associate an elastic ip with every new instance
+    // so we can preserve the ip across instance recycling.
+    new aws.autoscalingLifecycleHook.AutoscalingLifecycleHook(
+      name: "quickube-{props.size}-lifecycle-hook",
+      autoscalingGroupName: asg.name,
+      lifecycleTransition: "autoscaling:EC2_INSTANCE_LAUNCHING",
+      defaultResult: "ABANDON",
+      heartbeatTimeout: 300,
+      notificationTargetArn: instanceLaunchingSnsTopic.topicArn,
+      roleArn: "",
+    );
+
     new cdktf.TerraformOutput(value: sshKey.privateKeyPem, staticId: true, sensitive: true) as "pem";
   }
 

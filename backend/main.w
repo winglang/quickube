@@ -25,6 +25,12 @@ let dns = () => {
 }();
 
 new cp.Capacity(
+  size: t.Size.micro,
+  count: 20,
+  pool: pool.bucket,
+) as "MicroCapacity";
+
+new cp.Capacity(
   size: t.Size.small,
   count: 5,
   pool: pool.bucket,

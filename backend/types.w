@@ -1,4 +1,5 @@
 pub enum Size {
+  micro,
   small,
   medium,
   large,
@@ -72,6 +73,7 @@ pub class Defaults {
 
   pub static instanceTypes(): Array<InstanceType> {
     return [
+      { size: Size.micro, name: "t4g.micro", dailyCost: 0.0504, monthlyCost: 1.54, vcpu: 2, memory: 1, provider: Provider.aws   },
       { size: Size.small, name: "t4g.small", dailyCost: 0.2016, monthlyCost: 6.13, vcpu: 2, memory: 2, provider: Provider.aws   },
       { size: Size.medium, name: "t4g.medium", dailyCost: 0.4032, monthlyCost: 12.26, vcpu: 2, memory: 4, provider: Provider.aws },
       { size: Size.large, name: "t4g.xlarge", dailyCost: 1.6128, monthlyCost: 49.06, vcpu: 4, memory: 16, provider: Provider.aws },

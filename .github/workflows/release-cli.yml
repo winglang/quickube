@@ -9,56 +9,34 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  determine-version:
+  create-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.get_version.outputs.VERSION }}
+      version: ${{ steps.get_version.outputs }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         fetch-tags: true
-    - name: Get version
-      id: get_version
-      run: |
-        # version format is 1.2.3
-        PREV_VERSION=$(git describe --tags --abbrev=0 --match "v*" | sed 's/^v//')
-
-        # bump the middle number
-        MIDDLE_NUMBER=$(echo $PREV_VERSION | cut -d. -f2)
-        MIDDLE_NUMBER=$((MIDDLE_NUMBER+1))
-        VERSION=$(echo $PREV_VERSION | cut -d. -f1).$(echo $MIDDLE_NUMBER).$(echo $PREV_VERSION | cut -d. -f3)
-        echo "New version: $VERSION"
-
-        # emit as an output
-        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-  create-release:
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    needs:
-      - determine-version
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - id: bump
+      name: Determine version
+      uses: zwaldowski/match-label-action@v4
       with:
-        tag_name: v${{ needs.determine-version.outputs.version }}
-        release_name: Release v${{ needs.determine-version.outputs.version }}
-        draft: false
-        prerelease: false
+        allowed: major,minor,patch
+        default_match: minor
+    - uses: zwaldowski/semver-release-action@v3
+      name: Bump and release version
+      id: get_version
+      with:
+        bump: ${{ steps.bump.outputs.match }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
   release-js-cli:
     runs-on: ubuntu-latest
     needs:
       - create-release
-      - determine-version
+      - create-version
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -78,36 +56,36 @@ jobs:
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
         asset_path: ./dist/js/index.js
-        asset_name: qkube-v${{ needs.determine-version.outputs.version }}.js
+        asset_name: qkube-v${{ needs.create-version.outputs.version }}.js
         asset_content_type: application/javascript
 
-  # release-cli:
-  #   strategy:
-  #     matrix:
-  #       # platform: [macos-latest, ubuntu-latest, windows-latest]
-  #       platform: [macos-latest, ubuntu-latest]
-  #   runs-on: ${{ matrix.platform }}
-
-  #   needs:
-  #     - create-release
-  #     - determine-version
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #     - name: Install dependencies
-  #       run: npm install
-  #     - name: Create executable
-  #       run: ./scripts/seapack ./cli/qkube ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-  #     - name: Upload Release Asset
-  #       uses: actions/upload-release-asset@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ needs.create-release.outputs.upload_url }}
-  #         asset_path: ./dist/qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-  #         asset_name: qkube-v${{ needs.determine-version.outputs.version }}-${{ runner.os }}-${{ runner.arch }}
-  #         asset_content_type: application/octet-stream
+  release-npm:
+    runs-on: ubuntu-latest
+    needs:
+      - create-release
+      - create-version
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Install dependencies
+      run: npm ci
+    - name: Update package.json version
+      run: |
+        content=$(cat package.json)
+        updated_content=$(echo "$content" | jq --arg new_version "${{ needs.create-version.outputs.version }}" '.version = $new_version')
+        echo "$updated_content" > package.json
+    - name: Login to NPM
+      run: npm set //registry.npmjs.org/:_authToken ${{ secrets.NPM_PUBLISH_TOKEN }}
+    - name: Publish
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        timeout_minutes: 5
+        command: |
+          set -o pipefail
+          npm pack
+          npm publish --access public --verbose

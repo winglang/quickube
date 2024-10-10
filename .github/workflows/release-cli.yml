@@ -35,7 +35,6 @@ jobs:
   release-js-cli:
     runs-on: ubuntu-latest
     needs:
-      - create-release
       - create-version
     steps:
     - name: Checkout code
@@ -62,7 +61,6 @@ jobs:
   release-npm:
     runs-on: ubuntu-latest
     needs:
-      - create-release
       - create-version
     steps:
     - name: Checkout code

@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: '20'
 
@@ -12,7 +16,7 @@ jobs:
   create-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.get_version.outputs }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

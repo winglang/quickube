@@ -5,6 +5,7 @@
     "qkube": "./qkube"
   },
   "dependencies": {
+    "yaml": "^2.5.1",
     "yargs": "^17.7.2"
   }
 }

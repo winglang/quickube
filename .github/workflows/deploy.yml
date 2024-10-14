@@ -26,7 +26,7 @@ jobs:
       run: npm install
     - name: Run backend tests
       run: npx wing test
-      working-directory: ./backend
+      working-directory: ./packages/backend
 
   deploy-backend:
     runs-on: ubuntu-latest
@@ -47,11 +47,11 @@ jobs:
         run: npm install
       - name: Compile wing to tf-aws
         run: npx wing compile -t tf-aws -t ./platform.static-backend.js main.w
-        working-directory: ./backend
+        working-directory: ./packages/backend
         env:
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
       - run: terraform init
-        working-directory: backend/target/main.tfaws
+        working-directory: ./packages/backend/target/main.tfaws
       - run: terraform apply -auto-approve
-        working-directory: backend/target/main.tfaws
+        working-directory: ./packages/backend/target/main.tfaws
     

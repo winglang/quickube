@@ -26,11 +26,11 @@ async function addCluster(clusterInfo) {
     config.contexts = (config.contexts ?? []).filter(c => c.name !== newContext.name);
     config.contexts.push(newContext);
     config["current-context"] = newContext.name;
-    await fs.writeFile(kubeconfigFile, yaml.stringify(config));
+    await fs.writeFile(kubeconfigFile, yaml.stringify(config), { mode: 0o600 });
   } catch (e) {
     if (e.code === "ENOENT") {
       // if kubeconfig is not found, just create it with our cluster info. it should have everything!
-      await fs.writeFile(kubeconfigFile, yaml.stringify(clusterInfo));
+      await fs.writeFile(kubeconfigFile, yaml.stringify(clusterInfo), { mode: 0o600 });
     } else {
       throw e;
     }
@@ -59,7 +59,7 @@ async function deleteCluster(name) {
       }
     }
 
-    await fs.writeFile(kubeconfigFile, yaml.stringify(config));
+    await fs.writeFile(kubeconfigFile, yaml.stringify(config), { mode: 0o600 });
   } catch (e) {
     if (e.code === "ENOENT") {
       return;

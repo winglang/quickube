@@ -74,7 +74,7 @@ jobs:
       run: npm install
     - run: mkdir -p dist
     - name: Pack the CLI with @vercel/ncc
-      run: npx @vercel/ncc build ./cli/qkube -o ./dist/js
+      run: npx @vercel/ncc build ./packages/cli/qkube -o ./dist/js
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
@@ -99,6 +99,7 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Update package.json version
+      working-directory: ./packages/cli
       run: |
         content=$(cat package.json)
         updated_content=$(echo "$content" | jq --arg new_version "${{ needs.determine-version.outputs.version }}" '.version = $new_version')
@@ -112,5 +113,6 @@ jobs:
         timeout_minutes: 5
         command: |
           set -o pipefail
+          cd ./packages/cli
           npm pack
           npm publish --access public --verbose

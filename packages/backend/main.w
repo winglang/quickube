@@ -26,13 +26,13 @@ let dns = () => {
 
 new cp.Capacity(
   size: t.Size.small,
-  count: 5,
+  count: 7,
   pool: pool.bucket,
 ) as "SmallCapacity";
 
 new cp.Capacity(
   size: t.Size.medium,
-  count: 3,
+  count: 7,
   pool: pool.bucket,
 ) as "MediumCapacity";
 

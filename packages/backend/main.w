@@ -38,7 +38,7 @@ new cp.Capacity(
 
 new cp.Capacity(
   size: t.Size.large,
-  count: 7,
+  count: 13,
   pool: pool.bucket,
 ) as "LargeCapacity";
 

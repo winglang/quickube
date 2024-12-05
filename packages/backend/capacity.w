@@ -96,6 +96,11 @@ pub class Capacity {
       }),
     );
 
+    new aws.iamRolePolicyAttachment.IamRolePolicyAttachment(
+      role: role.name,
+      policyArn: "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    );
+
     new aws.iamRolePolicy.IamRolePolicy(
       role: role.name,
       policy: Json.stringify({
